@@ -148,7 +148,7 @@ public class Main : MonoBehaviour {
                 pz = (float)(double.Parse(textMessage[i].Split(' ')[5]));
                 Vector3 p = new Vector3(px, py, pz);
 
-                Debug.Log(px + " " + py + " " + pz);
+                
 
                 Pos.Add(p);
                 vx = (float)(double.Parse(textMessage[i].Split(' ')[6]));
@@ -180,18 +180,23 @@ public class Main : MonoBehaviour {
         //粒子を仮想的に配置
         for(int ix = -4;ix < 5; ix++)
         {
-            for (int iy = -4; ix < 5; ix++)
+            for (int iy = -4; iy < 5; iy++)
             {
-                for (int iz = -4; ix < 5; ix++)
+                for (int iz = -4; iz < 5; iz++)
                 {
                     double x = PCL_DST * ix;
                     double y = PCL_DST * iy;
                     double z = PCL_DST * iz;
                     double dist2 = x * x + y * y + z * z;
-                    if(dist2 <= r2)
+                    
+                    if (dist2 <= r2)
                     {
-                        if (dist2 == 0.0) continue;
+                        if (dist2 == 0.0)
+                        {
+                            continue;
+                        }
                         double dist = Mathf.Sqrt((float)dist2);
+                        
                         tn0 += wei(dist, r);
                         tlmd += dist2 * wei(dist, r);                        
                     }
@@ -204,6 +209,10 @@ public class Main : MonoBehaviour {
         A1 = 2.0 * KNM_VSC * DIM / n0 / lmd;//粘性項の計算に用いる係数
         A2 = SND * SND / n0;				//圧力の計算に用いる係数
         A3 = -DIM / n0;					//圧力勾配項の計算に用いる係数
+
+        
+
+
         for (int i = 0; i < 2; i++)//粒子の種類数(0:fld,1:wll)分初期化
         {
             Dns.Add(0.0);
@@ -224,6 +233,7 @@ public class Main : MonoBehaviour {
         iF = 0;         //ファイル番号
         TIM = 0.0;		//時刻
 
+        Debug.Log("SetPara done");
 
     }
 
@@ -253,6 +263,7 @@ public class Main : MonoBehaviour {
         {
             nxt.Add(-1);
         }
+        Debug.Log("AlcBkt done");
     }
 
     void MkBkt()//バケット格納
@@ -369,7 +380,7 @@ public class Main : MonoBehaviour {
 
                 Vector3 test = Pos[i];
                 
-                Debug.Log("test:"+test.x);
+                
 
                 int ix = (int)((pos_ix - MIN_X) * DBinv) + 1;
                 int iy = (int)((pos_iy - MIN_Y) * DBinv) + 1;
@@ -418,7 +429,10 @@ public class Main : MonoBehaviour {
         }
         for (int i = 0; i < nP; i++)
         {
-            Vel[i * 3] = Acc[i * 3]; Vel[i * 3 + 1] = Acc[i * 3 + 1]; Vel[i * 3 + 2] = Acc[i * 3 + 2];
+
+            Vector3 Vel_new = new Vector3((float)Acc[i].x, (float)Acc[i].y, (float)Acc[i].z);
+            Vel[i] = Vel_new;
+            //Vel[i * 3] = Acc[i * 3]; Vel[i * 3 + 1] = Acc[i * 3 + 1]; Vel[i * 3 + 2] = Acc[i * 3 + 2];
         }
     }
     void MkPrs()//仮圧力計算
@@ -502,6 +516,7 @@ public class Main : MonoBehaviour {
                                 double v1 = Pos[j].y - pos_iy;
                                 double v2 = Pos[j].z - pos_iz;
                                 double dist2 = v0 * v0 + v1 * v1 + v2 * v2;
+
                                 if (dist2 < r2)
                                 {
                                     if (j != i && Typ[j] != GST)
@@ -628,11 +643,20 @@ public class Main : MonoBehaviour {
         for (int i = 0; i < Pos.Count(); i++)
         {
             var obj = GameObject.Instantiate(Sphere,Pos[i] , Quaternion.identity) as GameObject;
+            if(Typ[i] == 1)
+            {
+                obj.GetComponent<Renderer>().material.color = new Color(0.0f, 1.0f, 0.0f, 1.0f);
+            }
+            if (Pos[i].z > 0.5)
+            {
+                obj.SetActive(false);
+            }
             list_particle_.Add(obj);
+            
         }
-        
-        SetPara();
         AlcBkt();
+        SetPara();
+        
         
     }
 	
@@ -642,10 +666,16 @@ public class Main : MonoBehaviour {
         //UpPcl();
         //ClcEMPS();
 
+
+        
+
+
             if (iLP % 100 == 0)//進行表示
             {
-                Debug.Log("time" + TIM + " step" + iLP);
-            }
+            Debug.Log("time" + TIM + " step" + iLP);
+            Debug.Log(Vel[14963].z);
+            Debug.Log(Pos[14963].z);
+        }
             //if (TIM > FIN_TIM) break;//終了判定
 
             MkBkt();//バケット格納
@@ -671,13 +701,12 @@ public class Main : MonoBehaviour {
                     list_particle_[i].transform.position = Pos[i];
                 }
             }
+        
 
-
-        iLP++;
+            iLP++;
             TIM += DT;
 
         
-
 
     }
 
