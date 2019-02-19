@@ -24,7 +24,8 @@ public class Main : MonoBehaviour {
     public static int DNS_FLD = 1000;
     public static int DNS_WLL = 1000;
 
-    public static double DT = 0.0005;
+    //public static double DT = 0.0005;
+    public static double DT = 0.001;
     public static double FIN_TIM = 1.0;
 
     public static double SND = 22.0;
@@ -113,7 +114,7 @@ public class Main : MonoBehaviour {
 
         Debug.Log("read input");
         TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
-        textasset = Resources.Load("dambreak", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+        textasset = Resources.Load("dambreak_", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
         string TextLines = textasset.text; //テキスト全体をstring型で入れる変数を用意して入れる
         string[] textMessage; //テキストの加工前の一行を入れる変数
                                       //Splitで一行づつを代入した1次配列を作成
@@ -343,7 +344,7 @@ public class Main : MonoBehaviour {
             {
                 Vector3 Vel_add = new Vector3((float)(Acc[i].x * DT), (float)(Acc[i].y * DT), (float)(Acc[i].z * DT));
                 Vel[i] = Vel[i] + Vel_add;
-                Vector3 Pos_add = new Vector3((float)(Acc[i].x * DT * DT), (float)(Acc[i].y * DT * DT), (float)(Acc[i].z * DT * DT));
+                Vector3 Pos_add = new Vector3((float)(Vel[i].x * DT), (float)(Vel[i].y  * DT), (float)(Vel[i].z  * DT));
                 Pos[i] = Pos[i] + Pos_add;
 
                 Vector3 zero = new Vector3((float)0, (float)0, (float)0);
@@ -605,12 +606,12 @@ public class Main : MonoBehaviour {
     {
         while (true)
         {
-            if (iLP % 100==0)//進行表示
-            {
-                Debug.Log("time" + TIM + " step" + iLP);
-            }
-            if (TIM > FIN_TIM) break;//終了判定
 
+            if (TIM > FIN_TIM)
+            {
+                Debug.Log("Fin");
+                break;//終了判定
+            }
             MkBkt();//バケット格納
             Vsctrm();//粘性項と重力項から仮加速度計算
             UpPcl1();//仮加速度から仮速度、仮位置計算
@@ -625,7 +626,10 @@ public class Main : MonoBehaviour {
             }
             iLP++;
             TIM += DT;
-
+            if (iLP % 1 == 0)
+            {
+                break;
+            }
          }
     }
 
@@ -647,7 +651,7 @@ public class Main : MonoBehaviour {
             {
                 obj.GetComponent<Renderer>().material.color = new Color(0.0f, 1.0f, 0.0f, 1.0f);
             }
-            if (Pos[i].z > 0.5)
+            if (Pos[i].y > 0.04)
             {
                 obj.SetActive(false);
             }
@@ -672,32 +676,35 @@ public class Main : MonoBehaviour {
 
             if (iLP % 100 == 0)//進行表示
             {
-            Debug.Log("time" + TIM + " step" + iLP);
-            Debug.Log(Vel[14963].z);
-            Debug.Log(Pos[14963].z);
-        }
-            //if (TIM > FIN_TIM) break;//終了判定
-
-            MkBkt();//バケット格納
-            Vsctrm();//粘性項と重力項から仮加速度計算
-            UpPcl1();//仮加速度から仮速度、仮位置計算
-            ChkCol();//剛体衝突計算
-            MkPrs();//仮圧力計算
-            PrsGrdTrm();//圧力勾配項、修正加速度計算
-            UpPcl2();////修正加速度から時刻更新後の位置と速度計算
-            MkPrs();//仮圧力計算
-            for (int i = 0; i < nP; i++)
-            {
-                pav[i] = Prs[i];
+                Debug.Log("time" + TIM + " step" + iLP);
             }
+        //if (TIM > FIN_TIM) break;//終了判定
 
+        /*
+
+             MkBkt();//バケット格納
+             Vsctrm();//粘性項と重力項から仮加速度計算
+             UpPcl1();//仮加速度から仮速度、仮位置計算
+             ChkCol();//剛体衝突計算
+             MkPrs();//仮圧力計算
+             PrsGrdTrm();//圧力勾配項、修正加速度計算
+             UpPcl2();////修正加速度から時刻更新後の位置と速度計算
+             MkPrs();//仮圧力計算
+             for (int i = 0; i < nP; i++)
+             {
+                 pav[i] = Prs[i];
+             }
+
+     */
+        ClcEMPS();
             //描画
             for (int i = 0; i < nP; i++)
             {
-            if (Typ[i] == FLD)
+                if (Typ[i] == FLD)
                 {
                     //Vector3 v = new Vector3(0.001f, 0.00f, 0.0f);
                     //Pos[i] = Pos[i] + v;
+
                     list_particle_[i].transform.position = Pos[i];
                 }
             }
