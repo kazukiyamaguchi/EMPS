@@ -641,7 +641,6 @@ public class Main : MonoBehaviour {
     GameObject obj;
     // Use this for initialization
     void Start () {
-        Application.targetFrameRate = 60;
         RdDat();
         
        
@@ -652,7 +651,7 @@ public class Main : MonoBehaviour {
             {
                 obj.GetComponent<Renderer>().material.color = new Color(0.0f, 1.0f, 0.0f, 1.0f);
             }
-            if (Pos[i].y > 0.01)
+            if (Pos[i].y > 0.04)
             {
                 obj.SetActive(false);
             }
@@ -697,9 +696,8 @@ public class Main : MonoBehaviour {
              }
 
      */
-            ClcEMPS();
+        ClcEMPS();
             //描画
-            
             for (int i = 0; i < nP; i++)
             {
                 if (Typ[i] == FLD)
@@ -710,8 +708,6 @@ public class Main : MonoBehaviour {
                     list_particle_[i].transform.position = Pos[i];
                 }
             }
-            
-            
         
 
             iLP++;
