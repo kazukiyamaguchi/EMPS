@@ -25,8 +25,8 @@ public class Main : MonoBehaviour {
     public static int DNS_WLL = 1000;
 
     //public static double DT = 0.0005;
-    public static double DT = 0.001;
-    public static double FIN_TIM = 1.0;
+    public static double DT = 0.0015;
+    public static double FIN_TIM = 3.0;
 
     public static double SND = 22.0;
     public static double OPT_FQC = 100;
@@ -651,7 +651,7 @@ public class Main : MonoBehaviour {
             {
                 obj.GetComponent<Renderer>().material.color = new Color(0.0f, 1.0f, 0.0f, 1.0f);
             }
-            if (Pos[i].y > 0.04)
+            if (Pos[i].y > 0.015)
             {
                 obj.SetActive(false);
             }
